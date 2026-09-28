@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Technology Quiz</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, #312e81, transparent 35%),
+        radial-gradient(circle at bottom right, #0f766e, transparent 35%),
+        #0f172a;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 850px;
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 25px 70px rgba(0,0,0,0.4);
+      backdrop-filter: blur(15px);
+    }
+
+    .start-screen {
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 70px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-bottom: 12px;
+      background: linear-gradient(90deg, #60a5fa, #a78bfa, #2dd4bf);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .info-box {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .info {
+      background: rgba(255,255,255,0.06);
+      padding: 15px;
+      border-radius: 14px;
+    }
+
+    .info strong {
+      display: block;
+      font-size: 22px;
+      color: #60a5fa;
+      margin-bottom: 5px;
+    }
+
+    .info span {
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    .start-btn {
+      width: 100%;
+      padding: 17px;
+      border-radius: 14px;
+      color: white;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+    }
+
+    .start-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(99,102,241,0.4);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* QUIZ */
+
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 15px;
+    }
+
+    .question-number {
+      color: #94a3b8;
+      font-size: 15px;
+    }
+
+    .score {
+      color: #facc15;
+      font-weight: bold;
+    }
+
+    .timer {
+      background: rgba(239,68,68,0.15);
+      color: #f87171;
+      border: 1px solid rgba(239,68,68,0.3);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-weight: bold;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    .timer.warning {
+      animation: pulse 0.8s infinite;
+      background: rgba(239,68,68,0.3);
+    }
+
+    @keyframes pulse {
+      50% {
+        transform: scale(1.06);
+      }
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 8px;
+      background: #1e293b;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6, #14b8a6);
+      transition: width 0.3s;
+    }
+
+    .question {
+      font-size: 25px;
+      line-height: 1.4;
+      margin-bottom: 25px;
+    }
+
+    .options {
+      display: grid;
+      gap: 12px;
+    }
+
+    .option {
+      width: 100%;
+      text-align: left;
+      padding: 17px 18px;
+      border-radius: 14px;
+      color: #e2e8f0;
+      background: #1e293b;
+      border: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .option:hover:not(:disabled) {
+      background: #273449;
+      border-color: #6366f1;
+      transform: translateX(3px);
+    }
+
+    .option-letter {
+      min-width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #334155;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    .option.correct {
+      background: rgba(34,197,94,0.16);
+      border-color: #22c55e;
+      color: #bbf7d0;
+    }
+
+    .option.correct .option-letter {
+      background: #22c55e;
+      color: #052e16;
+    }
+
+    .option.wrong {
+      background: rgba(239,68,68,0.16);
+      border-color: #ef4444;
+      color: #fecaca;
+    }
+
+    .option.wrong .option-letter {
+      background: #ef4444;
+      color: white;
+    }
+
+    .option:disabled {
+      cursor: default;
+    }
+
+    .feedback {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 13px;
+      display: none;
+      line-height: 1.5;
+    }
+
+    .feedback.correct {
+      display: block;
+      background: rgba(34,197,94,0.12);
+      color: #86efac;
+      border: 1px solid rgba(34,197,94,0.3);
+    }
+
+    .feedback.wrong {
+      display: block;
+      background: rgba(239,68,68,0.12);
+      color: #fca5a5;
+      border: 1px solid rgba(239,68,68,0.3);
+    }
+
+    .next-btn {
+      width: 100%;
+      margin-top: 18px;
+      padding: 15px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: white;
+      display: none;
+    }
+
+    .next-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    /* RESULT */
+
+    .result-screen {
+      text-align: center;
+    }
+
+    .result-icon {
+      font-size: 75px;
+      margin-bottom: 10px;
+    }
+
+    .result-title {
+      font-size: 34px;
+      margin-bottom: 10px;
+    }
+
+    .final-score {
+      font-size: 70px;
+      font-weight: bold;
+      background: linear-gradient(90deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 15px 0;
+    }
+
+    .result-message {
+      color: #cbd5e1;
+      margin-bottom: 25px;
+      font-size: 17px;
+    }
+
+    .result-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .result-stat {
+      background: rgba(255,255,255,0.06);
+      padding: 18px 10px;
+      border-radius: 14px;
+    }
+
+    .result-stat strong {
+      display: block;
+      font-size: 25px;
+      margin-bottom: 5px;
+    }
+
+    .result-stat span {
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    .correct-stat strong {
+      color: #4ade80;
+    }
+
+    .wrong-stat strong {
+      color: #f87171;
+    }
+
+    .restart-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #14b8a6, #2563eb);
+      color: white;
+      margin-bottom: 12px;
+    }
+
+    .home-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      background: #1e293b;
+      color: #cbd5e1;
+    }
+
+    .home-btn:hover,
+    .restart-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #64748b;
+      font-size: 12px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+
+      .card {
+        padding: 20px;
+        border-radius: 18px;
+      }
+
+      h1 {
+        font-size: 29px;
+      }
+
+      .logo {
+        font-size: 55px;
+      }
+
+      .info-box,
+      .result-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .question {
+        font-size: 20px;
+      }
+
+      .quiz-header {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- START SCREEN -->
+    <div id="startScreen" class="card start-screen">
+
+      <div class="logo">🤖</div>
+
+      <h1>AI Technology Quiz</h1>
+
+      <p class="subtitle">
+        Uji pengetahuanmu tentang Artificial Intelligence,
+        Machine Learning, teknologi digital, dan komputer.
+      </p>
+
+      <div class="info-box">
+        <div class="info">
+          <strong>35</strong>
+          <span>Soal</span>
+        </div>
+
+        <div class="info">
+          <strong>20s</strong>
+          <span>Per Soal</span>
+        </div>
+
+        <div class="info">
+          <strong>100</strong>
+          <span>Skor Maksimal</span>
+        </div>
+      </div>
+
+      <button class="start-btn" onclick="startQuiz()">
+        🚀 Mulai Quiz
+      </button>
+
+      <div class="footer">
+        AI Technology Quiz • Interactive Learning Game
+      </div>
+    </div>
+
+
+    <!-- QUIZ SCREEN -->
+    <div id="quizScreen" class="card hidden">
+
+      <div class="quiz-header">
+
+        <div class="question-number">
+          Soal <span id="currentQuestion">1</span> dari 35
+        </div>
+
+        <div class="score">
+          ⭐ Skor: <span id="score">0</span>
+        </div>
+
+        <div id="timer" class="timer">
+          ⏱️ 20s
+        </div>
+
+      </div>
+
+      <div class="progress-container">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+
+      <h2 id="question" class="question"></h2>
+
+      <div id="options" class="options"></div>
+
+      <div id="feedback" class="feedback"></div>
+
+      <button
+        id="nextBtn"
+        class="next-btn"
+        onclick="nextQuestion()"
+      >
+        Soal Berikutnya →
+      </button>
+
+    </div>
+
+
+    <!-- RESULT SCREEN -->
+    <div id="resultScreen" class="card result-screen hidden">
+
+      <div id="resultIcon" class="result-icon">
+        🏆
+      </div>
+
+      <h2 class="result-title">
+        Quiz Selesai!
+      </h2>
+
+      <div id="finalScore" class="final-score">
+        0
+      </div>
+
+      <p id="resultMessage" class="result-message"></p>
+
+      <div class="result-stats">
+
+        <div class="result-stat correct-stat">
+          <strong id="correctAnswers">0</strong>
+          <span>Jawaban Benar</span>
+        </div>
+
+        <div class="result-stat wrong-stat">
+          <strong id="wrongAnswers">0</strong>
+          <span>Jawaban Salah</span>
+        </div>
+
+        <div class="result-stat">
+          <strong id="percentage">0%</strong>
+          <span>Persentase</span>
+        </div>
+
+      </div>
+
+      <button class="restart-btn" onclick="startQuiz()">
+        🔄 Main Lagi
+      </button>
+
+      <button class="home-btn" onclick="goHome()">
+        🏠 Kembali ke Menu
+      </button>
+
+    </div>
+
+  </div>
+
+
+<script>
+
+const questions = [
+
+  {
+    question: "Apa kepanjangan dari AI?",
+    options: [
+      "Automated Intelligence",
+      "Artificial Intelligence",
+      "Advanced Integration",
+      "Algorithm Information"
+    ],
+    answer: 1
+  },
+
+  {
+    question: "Cabang AI yang fokus pada pengembangan algoritma agar komputer dapat belajar dari data disebut...",
+    options: [
+      "Robotics",
+      "Machine Learning",
+      "Cloud Computing",
+      "Cybersecurity"
+    ],
+    answer: 1
+  },
+
+  {
+    question: "Manakah dari berikut ini yang merupakan contoh pemanfaatan AI dalam kehidupan sehari-hari?",
+    options: [
+      "Asisten virtual seperti Siri dan Google Assistant",
+      "Kalkulator sederhana",
+      "Jam tangan analog",
+      "Lampu pijar biasa"
+    ],
+    answer: 0
+  },
+
+  {
+    question: "Teknologi AI yang memungkinkan komputer untuk memahami dan memproses bahasa manusia disebut...",
+    options: [
+      "Computer Vision",
+      "Natural Language Processing (NLP)",
+      "Expert System",
+      "Neural Network"
+    ],
+    answer: 1
+  },
+
+  {
+    question: "ChatGPT merupakan jenis AI berbasis model bahasa besar yang dikembangkan oleh perusahaan...",
+    options: [
+      "Google",
+      "Microsoft",
+      "OpenAI",
+      "Meta"
+    ],
+    answer: 2
+  },
+
+  {
+    question: "Apa istilah untuk kemampuan AI dalam mengenali objek, wajah, atau pemandangan dalam bentuk gambar atau video?",
+    options: [
+      "Natural Language Processing",
+      "Computer Vision",
+      "Big Data",
+      "IoT"
+    ],
+    answer: 1
+  },
+
+  {
+    question: "Teknologi yang menghubungkan berbagai perangkat fisik ke internet agar dapat saling bertukar data adalah...",
+    options: [
+      "Internet of Things (IoT)",
+      "Blockchain",
+      "Virtual Reality",
+      "Artificial General Intelligence"
+    ],
+    answer: 0
+  },
+
+  {
+    question: "Manakah yang merupakan algoritma pembelajaran mesin di mana model dilatih menggunakan data yang sudah berlabel?",
+    options: [
+      "Unsupervised Learning",
+      "Supervised Learning",
+      "Reinforcement Learning",
+      "Semi-supervised Learning"
+    ],
+    answer: 1
+  },
+
+  {
+    question: "Struktur pembelajaran mesin yang terinspirasi oleh jaringan saraf otak manusia disebut...",
+    options: [
+      "Decision Tree",
+      "Artificial Neural Network (ANN)",
+      "Linear Regression",
+      "Random Forest"
+    ],
+    answer: 1
+  },
+
+  {
+    question: "Komputasi yang memanfaatkan server jarak jauh melalui internet untuk menyimpan dan mengelola data disebut...",
+    options: [
+      "Edge Computing",
+      "Cloud Computing",
+      "Local Computing",
+      "Quantum Computing"
+    ],
+    answer: 1
+  },
+
+  {
+    question: "Apa yang dimaksud dengan Generative AI?",
+    options: [
+      "AI yang hanya bisa menghitung angka",
+      "AI yang mampu menghasilkan konten baru seperti teks, gambar, atau musik",
+      "AI yang digunakan untuk merakit mobil secara fisik",
+      "Sistem keamanan jaringan komputer"
+    ],
+    answer: 1
+  },
+
+  {
+    question: "Ujian yang dirancang oleh Alan Turing untuk menguji apakah mesin memiliki kecerdasan setara manusia disebut...",
+    options: [
+      "Turing Test",
+      "CAPTCHA Test",
+      "IQ Test",
+      "Voight-Kampff Test"
+    ],
+    answer: 0
+  },
+
+  {
+    question: "Subfield dari Machine Learning yang menggunakan jaringan saraf tiruan dengan banyak lapisan (deep layers) adalah...",
+    options: [
+      "Deep Learning",
+      "Shallow Learning",
+      "Data Mining",
+      "Web Scraping"
+    ],
+    answer: 0
+  },
+
+  {
+    question: "Teknologi yang menggabungkan dunia maya dengan dunia nyata secara real-time melalui perangkat digital disebut...",
+    options: [
+      "Virtual Reality (VR)",
+      "Augmented Reality (AR)",
+      "Mixed Reality (MR)",
+      "Metaverse"
+    ],
+    answer: 1
+  },
+
+  {
+    question: "Istilah bagi AI yang memiliki kecerdasan setara manusia dalam berbagai bidang secara umum adalah...",
+    options: [
+      "Artificial Narrow Intelligence (ANI)",
+      "Artificial General Intelligence (AGI)",
+      "Artificial Super Intelligence (ASI)",
+      "Weak AI"
+    ],
+    answer: 1
+  },
+
+  {
+    question: "Penggunaan data berukuran sangat besar dan kompleks yang memerlukan teknik analisis khusus dinamakan...",
+    options: [
+      "Big Data",
+      "Micro Data",
+      "Meta Data",
+      "Block Data"
+    ],
+    answer: 0
+  },
+
+  {
+    question: "Teknologi terenkripsi dan terdesentralisasi yang menjadi dasar pembuatan mata uang kripto adalah...",
+    options: [
+      "Cloud",
+      "Blockchain",
+      "Cybersecurity",
+      "Biometrics"
+    ],
+    answer: 1
+  },
+
+  {
+    question: "Sistem keamanan untuk melindungi perangkat, jaringan, dan data dari serangan digital adalah...",
+    options: [
+      "Cybercrime",
+      "Cybersecurity",
+      "Firewalls",
+      "Malware"
+    ],
+    answer: 1
+  },
+
+  {
+    question: "Program komputer jahat seperti virus, Trojan, dan ransomware secara umum dinamakan...",
+    options: [
+      "Hardware",
+      "Software",
+      "Malware",
+      "Firmware"
+    ],
+    answer: 2
+  },
+
+  {
+    question: "Proses pembelajaran AI di mana agen belajar melalui mekanisme hadiah (reward) dan hukuman (penalty) disebut...",
+    options: [
+      "Reinforcement Learning",
+      "Supervised Learning",
+      "Unsupervised Learning",
+      "Deep Learning"
+    ],
+    answer: 0
+  },
+
+  {
+    question: "Manakah dari perangkat berikut yang mengimplementasikan teknologi Autonomous Vehicle?",
+    options: [
+      "Mobil tanpa pengemudi (Self-driving car)",
+      "Sepeda manual",
+      "Mobil balap F1",
+      "Kereta uap tradisional"
+    ],
+    answer: 0
+  },
+
+  {
+    question: "Istilah Prompt Engineering dalam AI merujuk pada...",
+    options: [
+      "Perbaikan perangkat keras komputer",
+      "Seni merancang instruksi atau pertanyaan agar AI memberikan respons optimal",
+      "Pembuatan chip pemroses AI",
+      "Pengkodean bahasa pemrogram baru"
+    ],
+    answer: 1
+  },
+
+  {
+    question: "Komputer masa depan yang menggunakan prinsip mekanika kuantum (qubit) dinamakan...",
+    options: [
+      "Quantum Computer",
+      "Supercomputer",
+      "Mainframe Computer",
+      "Microcomputer"
+    ],
+    answer: 0
+  },
+
+  {
+    question: "Teknologi autentikasi yang menggunakan karakteristik fisik manusia seperti sidik jari atau pemindaian retina adalah...",
+    options: [
+      "Password",
+      "Biometrics",
+      "Encryption",
+      "Two-Factor Authentication"
+    ],
+    answer: 1
+  },
+
+  {
+    question: "Manakah bahasa pemrograman yang sangat populer digunakan dalam pengembangan data science dan AI?",
+    options: [
+      "HTML",
+      "Python",
+      "CSS",
+      "SQL"
+    ],
+    answer: 1
+  },
+
+  {
+    question: "Kondisi ketika model AI memberikan jawaban yang tampak yakin tetapi sebenarnya salah atau dibuat-buat disebut...",
+    options: [
+      "Overfitting",
+      "Hallucination",
+      "Underfitting",
+      "Bias"
+    ],
+    answer: 1
+  },
+
+  {
+    question: "Perangkat wearable seperti smartwatch memanfaatkan sensor untuk mengumpulkan data kesehatan. Ini termasuk contoh integrasi...",
+    options: [
+      "IoT dan AI",
+      "Quantum dan Blockchain",
+      "VR dan AR",
+      "Cloud dan Mainframe"
+    ],
+    answer: 0
+  },
+
+  {
+    question: "Kecenderungan AI memberikan hasil yang tidak adil akibat pengaruh data latih yang tidak seimbang disebut...",
+    options: [
+      "AI Bias",
+      "AI Hallucination",
+      "AI Drift",
+      "AI Overfitting"
+    ],
+    answer: 0
+  },
+
+  {
+    question: "Manakah dari berikut ini yang merupakan contoh pemanfaatan AI dalam bidang medis?",
+    options: [
+      "Menganalisis hasil pencitraan medis (X-ray/MRI) untuk deteksi penyakit",
+      "Mengatur suhu AC secara mekanis",
+      "Mencetak dokumen rekam medis",
+      "Membuat obat menggunakan cangkur manual"
+    ],
+    answer: 0
+  },
+
+  {
+    question: "Komponen perangkat keras komputer yang dirancang khusus untuk mempercepat pemrosesan grafik dan perhitungan AI adalah...",
+    options: [
+      "CPU",
+      "RAM",
+      "GPU",
+      "HDD"
+    ],
+    answer: 2
+  },
+
+  {
+    question: "Ruang virtual 3D di mana pengguna dapat berinteraksi melalui avatar disebut...",
+    options: [
+      "Cyber space",
+      "Metaverse",
+      "Dark web",
+      "Cloud space"
+    ],
+    answer: 1
+  },
+
+  {
+    question: "Jenis AI yang dilatih khusus hanya untuk menyelesaikan satu tugas spesifik (seperti bermain catur) disebut...",
+    options: [
+      "Narrow AI (Weak AI)",
+      "General AI",
+      "Super AI",
+      "Universal AI"
+    ],
+    answer: 0
+  },
+
+  {
+    question: "Teknologi pemrosesan data yang dilakukan di dekat sumber data (seperti perangkat IoT) alih-alih di cloud server terpusat dinamakan...",
+    options: [
+      "Edge Computing",
+      "Central Computing",
+      "Parallel Computing",
+      "Grid Computing"
+    ],
+    answer: 0
+  },
+
+  {
+    question: "Teknik manipulasi media berupa video atau audio yang mengubah wajah/suara seseorang menggunakan AI disebut...",
+    options: [
+      "Deepfake",
+      "Phishing",
+      "Spoofing",
+      "Spamming"
+    ],
+    answer: 0
+  },
+
+  {
+    question: "Kelebihan utama penerapan otomatisasi berbasis AI dalam industri manufaktur adalah...",
+    options: [
+      "Meningkatkan efisiensi dan mengurangi human error pada tugas berulang",
+      "Mengeliminasi seluruh kebutuhan energi listrik",
+      "Menghilangkan kebutuhan akan perangkat keras komputer",
+      "Menghentikan perkembangan teknologi baru"
+    ],
+    answer: 0
+  }
+
+];
+
+
+// ===============================
+// VARIABLES
+// ===============================
+
+let currentQuestionIndex = 0;
+let score = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let timeLeft = 20;
+let timerInterval;
+let answered = fa
